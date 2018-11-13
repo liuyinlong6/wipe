@@ -31,25 +31,41 @@ function drawMask(context){
 	context.globalCompositeOperation = "destination-out";
 }
 //在画布上画半径为30的圆
-function drawPoint(context,x,y){
-	console.log("传递实参的个数为"+arguments.length);
-	// console.log(x,y);
+// function drawPoint(context,x,y){
+// 	console.log("传递实参的个数为"+arguments.length);
+// 	// console.log(x,y);
+// 	context.save();
+// 	context.beginPath();
+// 	context.arc(x,y,radius,0,2*Math.PI);
+// 	context.fillStyle = "red";
+// 	context.fill();
+// 	context.restore();
+// }
+// function drawLine(context,x,y,a,b){
+// 	console.log("传递实参的个数为"+arguments.length);
+// 	context.save();
+// 	context.lineCap = "round";
+// 	context.beginPath();
+// 	context.moveTo(x,y);
+// 	context.lineTo(a,b);
+// 	context.lineWidth = radius*2;
+// 	context.stroke();
+// 	context.restore();
+// }
+function optimize(context,x,y,a,b){
 	context.save();
 	context.beginPath();
-	context.arc(x,y,radius,0,2*Math.PI);
-	context.fillStyle = "red";
-	context.fill();
-	context.restore();
-}
-function drawLine(context,x,y,a,b){
-	console.log("传递实参的个数为"+arguments.length);
-	context.save();
-	context.lineCap = "round";
-	context.beginPath();
-	context.moveTo(x,y);
-	context.lineTo(a,b);
-	context.lineWidth = radius*2;
-	context.stroke();
+	if(arguments.length < 4){
+		context.arc(x,y,radius,0,2*Math.PI);
+		context.fillStyle = "red";
+		context.fill();
+	}else{
+		context.lineCap = "round";
+		context.moveTo(x,y);
+		context.lineTo(a,b);
+		context.lineWidth = radius*2;
+		context.stroke();
+	}
 	context.restore();
 }
 //在canvas画布上监听自定义事件"mousedown",调用drawPoint函数
@@ -69,7 +85,7 @@ cas.addEventListener(eventdown,function(evt){
 	// }
 	x = device ? event.touches[0].clientX : event.clientX;
 	y = device ? event.touches[0].clientY : event.clientY;
-	drawPoint(context,x,y);
+	optimize(context,x,y);
 },false);
 //为画布添加手势操作
 // cas.addEventListener(eventdown,function(evt){
@@ -104,7 +120,7 @@ function fn1(evt){
 		// }
 			var a = device ? event.touches[0].clientX : event.clientX;
 			var b = device ? event.touches[0].clientY : event.clientY;
-			drawLine(context,x,y,a,b);
+			optimize(context,x,y,a,b);
 			x = a;
 			y = b;
 		}
