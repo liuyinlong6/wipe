@@ -52,6 +52,7 @@ function drawMask(context){
 // 	context.stroke();
 // 	context.restore();
 // }
+// 用一个函数代替；两个函数
 function optimize(context,x,y,a,b){
 	context.save();
 	context.beginPath();
