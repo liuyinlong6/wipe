@@ -11,9 +11,9 @@ module.exports = function(grunt){
 			options:{
 				banner:'/*!<%= pkg.name %> <%= pkg.version %> 发布日期:<%= grunt.template.today("yyyy-mm-dd")%>*/',
 			},
-			build:{
+			dist:{
 				src:"src/js/wipe.js",
-				dest:"build/js/wipe-<%= pkg.version %>.min.js"
+				dest:"dist/js/wipe-<%= pkg.version %>.min.js"
 			}
 		},
 		cssmin:{
@@ -26,13 +26,13 @@ module.exports = function(grunt){
 					expand:true,
 					cwd:'src/css',
 					src:['*.css'],
-					dest:'build/css',
+					dest:'dist/css',
 					ext:'.min.css'
 				}]
 			}
 		},
 		clean:{
-			dest:['build/*','sample/js/*']
+			dest:['dist/*','sample/js/*']
 		},
 		jshint:{
 			test:['src/js/wipe.js'],
@@ -41,15 +41,20 @@ module.exports = function(grunt){
 			}
 		},
 		copy: {
-		    js: {expand: true, cwd: 'src/js/', src: '*.min.js', dest: 'sample/js/'}
+		    js: {expand: true, cwd: 'dist/js', src: '*.min.js', dest: 'sample/case-list/'}
 		},
 		replace:{
-			src:['sample/js/index.html'],
+			example:{
+			src:['sample/case-list/index.html'],
 			overwrite:true,
 			replacements:[{
-				from:/wipe-\.\.min\.js/g,
-				to:'wipe-<%= pkg.version %>.min.js'
+				from:/\d[\.]\d[\.]\d/g,
+				to:'<%= pkg.version %>'
+			},{
+				from:/hello\.css/g,
+				to:'hello.min.css'
 			}]
+		}
 		}
 	});
 	//告诉grunt需要使用插件
@@ -58,7 +63,8 @@ module.exports = function(grunt){
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-text-replace');
 	//告诉grunt当我们输入grunt命令后需要这些什么，有先后顺序
-	grunt.registerTask('default',['jshint','clean','uglify','copy']);
+	grunt.registerTask('default',['jshint','clean','uglify','copy','replace']);
 
 };
