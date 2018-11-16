@@ -32,7 +32,7 @@ module.exports = function(grunt){
 			}
 		},
 		clean:{
-			dest:['dist/*','sample/js/*']
+			dest:['dist/*','sample/js/*','sample/case-list']
 		},
 		jshint:{
 			test:['src/js/wipe.js'],
