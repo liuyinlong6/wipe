@@ -1,6 +1,6 @@
 {
   "name": "wipe-lyl",
-  "version": "1.0.2",
+  "version": "3.0.0",
   "devDependencies": {
     "grund": "^1.0.7",
     "grunt": "^1.0.3",
