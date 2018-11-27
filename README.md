@@ -43,8 +43,26 @@ var wipeConfig = {
 	percentage:60, //超出多少后显示底层图片
 	callback:wipeCallback //用户自定义回调函数名称
 }
- ``` 3.初始化wipe插件，并将上面一步的配置作为参数传入列如：``` 
+ ```
+ 
+3.初始化wipe插件，并将上面一步的配置作为参数传入
+
+列如：
+``` 
 new Wipe(wipeConfig);
- ```4.编写回调函数。用户在涂抹完成后继续操作必须写在此回调函数中。例如：``` 
-function wipeCallback(percent){	if(percent>wipeCallback.percentage){		console.log("透明面积超过"+wipeConfig.percentage+",查看底图");	}}
- ```
+ ```
+
+4.编写回调函数。用户在涂抹完成后继续操作必须写在此回调函数中。
+例如：
+``` 
+function wipeCallback(percent){
+	if(percent>wipeCallback.percentage){
+		console.log("透明面积超过"+wipeConfig.percentage+",查看底图");
+	}
+}
+
+ ```
+## ver 4.0.0 ##
+定位偏移量修改
+
+
