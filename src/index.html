@@ -18,11 +18,22 @@
 			border: 1px solid #000;
 			background: url(img/wipe1.jpg) center 0 no-repeat;
 			background-size: cover;
+			position: absolute;
+			top: 20px;
+			left: 50px;
+		}
+		#box{
+			position:relative;
+		}
+		#cas{
+			position: absolute;
+			top: 50px;
+			left: 50px;
 		}
 	</style>
 </head>
 <body>
-	<div>
+	<div id="box">
 		<canvas id="cas" width="375" height="667"></canvas>
 	</div>
 </body>
@@ -40,14 +51,14 @@ var wipeConfig = {
 	width:"375",//canvas宽
 	height:"667",//canvas高
 	radius:"10" , //涂抹笔的半径
-	percentage:60, //超出多少后显示底层图片
+	percentage:30, //超出多少后显示底层图片
 	callback:wipeCallback //用户自定义回调函数名称
 }
 var cas1 = new Wipe(wipeConfig);
 // console.log(cas01);
 function wipeCallback(percent){
 	if(percent>wipeCallback.percentage){
-		console.log("透明面积超过"+wipeConfig.percentage+",查看底图");
+		console.log("透明面积超过"+wipeConfig.percentage+"%,查看底图");
 	}
 }
 </script>

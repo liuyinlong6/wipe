@@ -1,138 +1,137 @@
 /*
-author: 3282579826@qq.com
-data: 2018-11-16
-
- */
+author: yas
+data：	2018-11-19
+email:
+*/
 function Wipe(obj){
 	this.conID = obj.id;
-	this.cas = document.getElementById(this.conID);
-	this.context = cas.getContext("2d");
-	this._w = obj.width;
-	this._h = obj.height;
-	this.coverType = obj.coverType; // 覆盖的是颜色还是图
-	// this.color = obj.color? "#666":obj.color;  // 覆盖的颜色
+	this.canvas = document.getElementById(this.conID);
+	this.context = this.canvas.getContext("2d");
+	this._w = this.canvas.width;
+	this._h = this.canvas.height;
+	this.coverType = obj.coverType;
 	this.color = obj.color || "#666";
-	this.imgUrl = obj.imgUrl;  // 覆盖图
-	this.backImgUrl = obj.backImgUrl;  // 背景图
-	this.radius = obj.radius;  // 涂抹的半径
-	this.posX = 0;
-	this.posY = 0;
-	this.isMouseDown = false;  // 表示鼠标的状态, 是否按下
+	this.imgUrl = obj.imgUrl;
+	this.backImgUrl = obj.backImgUrl;
+	this.radius = obj.radius;
+	this.moveX = 0;
+	this.moveY = 0;
+	this.isMouseDown = false;
 	this.callback = obj.callback;
-	this.transpercent = obj.transpercent;  // 用户定义的百分比
-	this.drawMask();	
-	this.addEvent();
+	this.transpercent = obj.percentage;
+	this.drawMask();
+	this.drawMove();
 }
-// 生成画布上的遮罩, 默认为颜色#666
-Wipe.prototype.drawMask = function(){
-	if (this.coverType === "color") {
-		this.context.fillStyle = this.color;
-		this.context.fillRect(0,0,this._w,this._h);
-		this.context.globalCompositeOperation="destination-out";
-	}else if(this.coverType === "image"){
-		// 将imgUrl指定的图片填充画布
-		var img = new Image();
-		var that = this;
-		img.src = this.imgUrl;
-		img.onload = function(){
-			// 裁剪图片
-			that.context.drawImage(img,0,0,img.width,img.height,0,0,that._w,that._h);
-			that.context.globalCompositeOperation = "destination-out";
-		};
-	}	
-};
-// drawT画点画线函数
-// 参数: 如果只传递两个参数, 函数功能画圆, x1,y1即圆的中心坐标.
-// 如果传递四个参数, 函数功能画线, x1,y1为起始坐标, x2,y2为结束坐标
-Wipe.prototype.drawT = function(x1,y1,x2,y2){
-	if (arguments.length===3) {
-		// 调用的是画点功能
+//drawT()画点和画线函数
+//参数：如果只有两个参数，函数功能画圆，x1,y1即圆的中心坐标 
+//如果传递四个参数，函数功能画线，x1,y1为起始坐标，x2,y2为结束坐标
+Wipe.prototype.drawZio = function(x1,y1,x2,y2){
+	if(arguments.length === 2){
 		this.context.save();
 		this.context.beginPath();
 		this.context.arc(x1,y1,this.radius,0,2*Math.PI);
-		this.context.fillStyle = "red";
+		this.context.fillStyle = "rgba(255,0,0,255)";
 		this.context.fill();
 		this.context.restore();
-	}else if(arguments.length===4){
-		// 调用的是画线功能
+	}else if(arguments.length === 4){
 		this.context.save();
-		this.context.lineCap = "round";
 		this.context.beginPath();
-		this.context.moveTo(x1, y1);
+		this.context.moveTo(x1,y1);
 		this.context.lineTo(x2,y2);
 		this.context.lineWidth = this.radius*2;
+		this.context.lineCap = "round";
 		this.context.stroke();
 		this.context.restore();
 	}else{
 		return false;
 	}
-};
-// 清除画布
+}
+
+Wipe.prototype.drawMask = function(){
+	if(this.coverType === "color"){
+		this.context.fillStyle = this.color;
+		this.context.fillRect(0,0,this._w,this._h);
+		this.context.globalCompositeOperation = "destination-out";
+	}else if(this.coverType === "img" ){
+		var img = new Image();
+		var that = this;
+		img.src = this.imgUrl;
+		img.onload = function(){
+			that.context.drawImage(img,0,0,img.width,img.height,0,0,that._w,that._h);
+			that.context.globalCompositeOperation="destination-out";
+		}
+	}
+}
+
 Wipe.prototype.clearRect = function(){
 	this.context.clearRect(0,0,this._w,this._h);
-};
-// 获取透明点占整个画布的百分比
+}
+
 Wipe.prototype.getTransparencyPercent = function(){
 	var t = 0;
 	var imgData = this.context.getImageData(0,0,this._w,this._h);
-	for (var i = 0; i < imgData.data.length; i+=4) {
+	for(var i=0; i<imgData.data.length; i+=4){
 		var a = imgData.data[i+3];
-		if ( a === 0 ) {
+		if(a === 0){
 			t++;
 		}
 	}
-	this.percent = (t/(this._w*this._h))*100;
-	console.log("透明点的个数："+t);
-	console.log("占总面积"+Math.ceil(this.percent)+"%");
 
-	return this.percent.toFixed(2);  // 截取小数点两位3
-	// return Math.round(this.percent);
-};
-Wipe.prototype.addEvent = function(){
+	this.percent = (t / (this._w*this._h))*100;
+	console.log("透明点的个数：" + t);
+	console.log("占总面积" + Math.ceil(this.percent) + "%");
+	return Math.round(this.percent);
+}
+
+
+Wipe.prototype.drawMove = function(){
 	this.device = (/android|webos|iPhone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase()));
-	var clickEvtName = this.device ? "touchstart" : "mousedown";
-	var moveEvtName = this.device ? "touchmove" : "mousemove";
-	var endEvtName = this.device ? "touchend" : "mouseup";
-
+	console.log(this.device);
+	var down = this.device?"touchstart":"mousedown";
+	var move = this.device?"touchmove":"mousemove";
+	var up = this.device?"touchend":"mouseup";
+	var	allTop = this.canvas.offsetTop;
+	var allLeft = this.canvas.offsetLeft;
+	var scrollTop;
+	var scrollLeft;
+	var tobj = this.canvas;
+	while(tobj = tobj.offsetParent){
+		allTop += tobj.offsetTop;
+		allLeft += tobj.offsetLeft;
+	}
 	var that = this;
-	this.cas.addEventListener(clickEvtName,function(evt){
-		that.isMouseDown = true;
-		
+	this.canvas.addEventListener(down,function(evt){
 		var event = evt || window.event;
-		// 获取鼠标在视口的坐标, 传递参数到drawPoint
-		scrollTop=document.documentElement.scrollTop||document.body.scrollTop;
-		scrollLeft=document.documentElement.scrollLeft||document.body.scrollLeft;
-		that.posX = that.device ? event.touches[0].clientX+scrollLeft : event.clientX+scrollLeft;
-		that.posY = that.device ? event.touches[0].clientY+scrollTop : event.clientY+scrollTop;
-		
-		that.drawT(that.posX,that.posY);
+		scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+		scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
+		that.moveX = that.device?event.touches[0].clientX - allLeft + scrollLeft :event.clientX - allLeft + scrollLeft;
+		that.moveY = that.device?event.touches[0].clientY - allTop + scrollTop :event.clientY - allTop + scrollTop;
+		that.drawZio(that.moveX,that.moveY);
+		that.isMouseDown = true;
 	},false);
-	this.cas.addEventListener(moveEvtName,function(evt){
-		// 判断, 当isMouseDown为true时, 才执行下面的操作
-		if ( !that.isMouseDown) {
+
+	this.canvas.addEventListener(move,function(evt){
+		if(!that.isMouseDown){
 			return false;
 		}else{
 			var event = evt || window.event;
 			event.preventDefault();
-			// 获取鼠标在视口的坐标, 传递参数到drawPoint
-			var x2 = that.device ? event.touches[0].clientX+scrollLeft : event.clientX+scrollLeft;
-			var y2 = that.device ? event.touches[0].clientY+scrollTop : event.clientY+scrollTop;
-			that.drawT(that.posX,that.posY,x2,y2);
-			// 每次的结束点变成下一次画线的开始点
-			that.posX = x2;
-			that.posY = y2;
+			scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+			scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
+			var x2 = that.device?event.touches[0].clientX - allLeft + scrollLeft :event.clientX - allLeft + scrollLeft;
+			var y2 = that.device?event.touches[0].clientY - allTop + scrollTop :event.clientY - allTop + scrollTop;
+			that.drawZio(that.moveX,that.moveY,x2,y2);
+			that.moveX = x2;
+			that.moveY = y2;
 		}
 	},false);
-	this.cas.addEventListener(endEvtName,function(){
-		//还原isMouseDown 为false
+
+	this.canvas.addEventListener(up,function(){
 		that.isMouseDown = false;
-		console.log(that.transpercent);
 		var percent = that.getTransparencyPercent();
-		// 调用同名的全局函数
-		that.callback.call(null,percent);
-		// 当透明面积超过用户指定的透明面积
-		if(percent>that.transpercent) {
+		that.callback.call(null,percent);	//等同于null
+		if(percent > that.transpercent){
 			that.clearRect();
 		}
 	},false);
-};
+}
